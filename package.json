@@ -1,0 +1,81 @@
+{
+  "name": "auto-update-web-scrobbler",
+  "version": "0.0.0",
+  "description": "",
+  "homepage": "https://github.com/tomacheese/auto-update-web-scrobbler",
+  "bugs": {
+    "url": "https://github.com/tomacheese/auto-update-web-scrobbler/issues"
+  },
+  "license": "MIT",
+  "author": "Tomachi <tomachi@tomacheese.com>",
+  "private": true,
+  "main": "dist/main.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tomacheese/auto-update-web-scrobbler.git"
+  },
+  "scripts": {
+    "dev": "tsx watch ./src/main.ts",
+    "start": "tsx ./src/main.ts",
+    "package": "run-z clean compile packing",
+    "packing": "ncc build ./dist/main.js -o output/ -m",
+    "compile": "tsc -p .",
+    "clean": "rimraf dist output",
+    "fix:prettier": "prettier --write src",
+    "lint:tsc": "tsc",
+    "lint:eslint": "eslint . --ext ts,tsx",
+    "fix": "run-z fix:prettier fix:eslint",
+    "fix:eslint": "eslint . --ext ts,tsx --fix",
+    "lint": "run-z lint:prettier,lint:eslint,lint:tsc",
+    "lint:prettier": "prettier --check src",
+    "test": "jest --runInBand --passWithNoTests --detectOpenHandles --forceExit"
+  },
+  "devDependencies": {
+    "@book000/node-utils": "1.12.15",
+    "@types/jest": "29.5.11",
+    "@types/lodash": "4.14.202",
+    "@types/node": "20.10.6",
+    "@typescript-eslint/eslint-plugin": "6.17.0",
+    "@typescript-eslint/parser": "6.17.0",
+    "@vercel/ncc": "0.38.1",
+    "axios": "1.6.4",
+    "eslint": "8.56.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-config-standard": "17.1.0",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-n": "16.6.1",
+    "eslint-plugin-promise": "6.1.1",
+    "eslint-plugin-unicorn": "50.0.1",
+    "jest": "29.7.0",
+    "jest-expect-message": "1.1.3",
+    "level": "8.0.0",
+    "lodash": "4.17.21",
+    "prettier": "3.1.1",
+    "rimraf": "5.0.5",
+    "run-z": "2.0.0",
+    "ts-jest": "29.1.1",
+    "tsx": "4.7.0",
+    "typescript": "5.3.3"
+  },
+  "packageManager": "pnpm@8.14.0",
+  "jest": {
+    "testMatch": [
+      "**/*.test.ts"
+    ],
+    "transform": {
+      "^.+\\.ts$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.json"
+        }
+      ]
+    },
+    "moduleFileExtensions": [
+      "js",
+      "ts"
+    ],
+    "setupFilesAfterEnv": [
+      "jest-expect-message"
+    ]
+  }
+}
