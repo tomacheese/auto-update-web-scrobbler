@@ -2,6 +2,7 @@
   "ignores": [
     "@types/node",
     "run-z",
-    "@types/jest"
+    "@types/jest",
+    "rimraf",
   ]
 }
