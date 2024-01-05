@@ -3,6 +3,6 @@
     "@types/node",
     "run-z",
     "@types/jest",
-    "rimraf",
+    "rimraf"
   ]
 }
