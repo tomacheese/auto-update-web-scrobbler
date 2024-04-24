@@ -31,7 +31,7 @@
     "test": "jest --runInBand --passWithNoTests --detectOpenHandles --forceExit"
   },
   "devDependencies": {
-    "@book000/node-utils": "1.13.8",
+    "@book000/node-utils": "1.13.10",
     "@types/jest": "29.5.12",
     "@types/lodash": "4.17.0",
     "@types/node": "20.12.7",
