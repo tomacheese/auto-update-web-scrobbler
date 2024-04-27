@@ -26,9 +26,7 @@ export interface IConfiguration {
 }
 
 export class Configuration extends ConfigFramework<IConfiguration> {
-  protected validates(): {
-    [key: string]: (config: IConfiguration) => boolean
-  } {
+  protected validates(): Record<string, (config: IConfiguration) => boolean> {
     return {
       'server is required': (config) => !!config.server,
       'server is string': (config) => typeof config.server === 'string',

@@ -12,9 +12,7 @@ interface WebScrobberTrack {
   albumArtist: string | null
 }
 
-type WebScrobberTracks = {
-  [vid: string]: WebScrobberTrack
-}
+type WebScrobberTracks = Record<string, WebScrobberTrack>
 
 export class WebScrobberExtension {
   private readonly readLevelDbPath: string
@@ -34,11 +32,11 @@ export class WebScrobberExtension {
   public async getTracks(): Promise<ApiTrack[]> {
     const database = await this.getLevelDatabase(this.readLevelDbPath)
 
-    const tracks: WebScrobberTracks = await database.get('LocalCache')
-    if (!tracks) {
+    if (!('LocalCache' in database.keys())) {
       return []
     }
 
+    const tracks: WebScrobberTracks = await database.get('LocalCache')
     return this.convertToApiTracks(tracks)
   }
 
@@ -46,7 +44,7 @@ export class WebScrobberExtension {
     const database = await this.getLevelDatabase(this.writeLevelDbPath)
 
     // eslint-disable-next-line unicorn/no-array-reduce
-    const newTracks = tracks.reduce((accumulator, track) => {
+    const newTracks = tracks.reduce<WebScrobberTracks>((accumulator, track) => {
       return {
         ...accumulator,
         [track.vid]: {
@@ -56,7 +54,7 @@ export class WebScrobberExtension {
           albumArtist: track.albumArtist ?? null,
         },
       }
-    }, {} as WebScrobberTracks)
+    }, {})
 
     await database.put('LocalCache', newTracks)
     await database.close()

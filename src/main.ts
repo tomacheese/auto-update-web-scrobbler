@@ -8,7 +8,7 @@ import { WebScrobberExtension } from './web-scrobber'
  *
  * @returns 設定。設定が不正な場合は `null` を返す
  */
-async function loadConfiguration(): Promise<Configuration | null> {
+function loadConfiguration(): Configuration | null {
   const logger = Logger.configure('loadConfiguration')
   logger.info('🔄 Loading configuration')
   const config = new Configuration('data/config.json')
@@ -81,10 +81,10 @@ async function getBrowserTracks(
  * @param browserTracks ブラウザから取得したトラック情報
  * @returns マージされたトラック情報
  */
-async function mergeTracks(
+function mergeTracks(
   serverTracks: ApiTrack[],
   browserTracks: ApiTrack[]
-): Promise<ApiTrack[]> {
+): ApiTrack[] {
   const logger = Logger.configure('mergeTracks')
   logger.info('🔀 Merge tracks')
   const mergedTracks: ApiTrack[] = []
@@ -176,7 +176,7 @@ async function main() {
 
   logger.info('🔄 Start')
   try {
-    const config = await loadConfiguration()
+    const config = loadConfiguration()
     if (!config) {
       return
     }
@@ -189,7 +189,7 @@ async function main() {
     const browserTracks = await getBrowserTracks(levelDatabasePaths)
 
     // Merge tracks
-    const mergedTracks = await mergeTracks(serverTracks, browserTracks)
+    const mergedTracks = mergeTracks(serverTracks, browserTracks)
 
     // Update browser
     await updateBrowser(levelDatabasePaths, mergedTracks)
