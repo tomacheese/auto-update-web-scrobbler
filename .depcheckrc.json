@@ -3,6 +3,10 @@
     "@types/node",
     "run-z",
     "@types/jest",
-    "rimraf"
+    "rimraf",
+    "eslint-config-standard",
+    "eslint-plugin-import",
+    "eslint-plugin-n",
+    "eslint-plugin-promise"
   ]
 }
