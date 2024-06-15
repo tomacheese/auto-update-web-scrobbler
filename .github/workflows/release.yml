@@ -176,8 +176,8 @@ jobs:
           $ZIP_FILENAME = "${REPO}_${env:VERSION}-${env:FILE_OS}.zip"
           $ZIP_PATH = "${env:GITHUB_WORKSPACE}\output\$ZIP_FILENAME"
           Compress-Archive -Path "${env:GITHUB_WORKSPACE}\output\*" -DestinationPath $ZIP_PATH
-          echo "zip-path=$ZIP_PATH" >> $env:GITHUB_ENV
-          echo "zip-filename=$ZIP_FILENAME" >> $env:GITHUB_ENV
+          echo "zip-path=$ZIP_PATH" >> $env:GITHUB_OUTPUT
+          echo "zip-filename=$ZIP_FILENAME" >> $env:GITHUB_OUTPUT
         env:
           VERSION: ${{ needs.calc-version.outputs.tag }}
           FILE_OS: ${{ matrix.os }}
@@ -185,7 +185,7 @@ jobs:
       - name: 📂 ls
         run: |
           pwd
-          ls -la
+          ls -la output
 
       - name: 📤 Upload Release Asset
         uses: shogo82148/actions-upload-release-asset@v1.7.5
