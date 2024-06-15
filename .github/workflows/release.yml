@@ -1,0 +1,171 @@
+name: Release
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+    types:
+      - opened
+      - synchronize
+    paths:
+      - .github/workflows/release.yml
+  pull_request_target:
+    branches:
+      - main
+      - master
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+jobs:
+  # バージョンを計算する
+  calc-version:
+    name: Calculate next version
+    runs-on: ubuntu-latest
+
+    outputs:
+      # バージョン
+      version: ${{ steps.tag-version.outputs.new_version }}
+      # バージョンタグ
+      tag: ${{ steps.tag-version.outputs.new_tag }}
+      # リリースノート
+      changelog: ${{ steps.tag-version.outputs.changelog }}
+
+    steps:
+      - name: 📥 Check out the repo
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          # マージされていない時には github.event.pull_request.head.sha を使い、マージされた時にはgithub.base_refを使う
+          ref: ${{ github.event.pull_request.merged == true && github.base_ref || github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: 🏷️ Bump version and push tag
+        id: tag-version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: "minor"
+          custom_release_rules: "feat:minor:✨ Features,fix:patch:🐛 Fixes,docs:patch:📰 Docs,chore:patch:🎨 Chore,pref:patch:🎈 Performance improvements,refactor:patch:🧹 Refactoring,build:patch:🔍 Build,ci:patch:🔍 CI,revert:patch:⏪ Revert,style:patch:🧹 Style,test:patch:👀 Test,release:major:📦 Release"
+          dry_run: ${{ github.event.pull_request.merged == true && 'false' || 'true' }}
+
+  release:
+    name: Release ${{ needs.calc-version.outputs.tag }}
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    needs:
+      - calc-version
+
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+
+    steps:
+      - name: 📦 Create Release
+        id: create_release
+        uses: ncipollo/release-action@v1.14.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag: ${{ needs.calc-version.outputs.tag }}
+          name: ${{ needs.calc-version.outputs.tag }}
+          body: ${{ needs.calc-version.outputs.changelog }}
+          draft: false
+          prerelease: false
+
+  upload-package:
+    name: Upload package ${{ needs.calc-version.outputs.tag }}
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    needs:
+      - calc-version
+      - release
+
+    steps:
+      - name: 📥 Check out the repo
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+        with:
+          # マージされていない時には github.event.pull_request.head.sha を使い、マージされた時にはgithub.base_refを使う
+          ref: ${{ github.event.pull_request.merged == true && github.base_ref || github.event.pull_request.head.sha }}
+
+      - name: 📂 Check exists .node-version
+        id: check-node-version-file
+        run: |
+          if [ ! -f ".node-version" ]; then
+            echo "exists=false" >> $GITHUB_OUTPUT
+          else
+            echo "exists=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🏗️ Setup node env
+        uses: actions/setup-node@v4
+        if: ${{ steps.check-node-version-file.outputs.exists == 'true' }}
+        with:
+          node-version-file: .node-version
+
+      - name: 🏗️ Setup node env
+        if: ${{ steps.check-node-version-file.outputs.exists == 'false' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 📝 Check package manager
+        id: check-package-manager
+        run: |
+          if [ -f "yarn.lock" ]; then
+            echo "package-manager=yarn" >> "$GITHUB_OUTPUT"
+          elif [ -f "pnpm-lock.yaml" ]; then
+            echo "package-manager=pnpm" >> "$GITHUB_OUTPUT"
+          else
+            echo "package-manager=npm" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        if: ${{ steps.check-package-manager.outputs.package-manager == 'pnpm' }}
+        with:
+          run_install: false
+
+      - name: 📦 Install dependencies
+        run: |
+          if [ "${{ steps.check-package-manager.outputs.package-manager }}" == "yarn" ]; then
+            yarn install --frozen-lockfile
+          elif [ "${{ steps.check-package-manager.outputs.package-manager }}" == "pnpm" ]; then
+            pnpm install --frozen-lockfile --prefer-frozen-lockfile
+          else
+            npm install
+          fi
+
+      - name: 🎁 Run package
+        run: |
+          if [ "${{ steps.check-package-manager.outputs.package-manager }}" == "yarn" ]; then
+            yarn package
+          elif [ "${{ steps.check-package-manager.outputs.package-manager }}" == "pnpm" ]; then
+            pnpm run package
+          else
+            npm run package
+          fi
+
+      - name: 📦 Create zip
+        id: create-zip
+        run: |
+          REPO="${GITHUB_REPOSITORY#"${GITHUB_REPOSITORY_OWNER}/"}"
+          ZIP_FILENAME=${REPO}_${{ needs.calc-version.outputs.tag }}.zip
+          ZIP_PATH=$(pwd)/output/${ZIP_FILENAME}
+          cd output
+          zip -r ${ZIP_PATH} ./*
+          echo "zip-path=${ZIP_PATH}" >> $GITHUB_OUTPUT
+          echo "zip-filename=${ZIP_FILENAME}" >> $GITHUB_OUTPUT
+
+      - name: 📂 ls
+        run: |
+          pwd
+          ls -la
+
+      - name: 📤 Upload Release Asset
+        uses: shogo82148/actions-upload-release-asset@v1.7.5
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ${{ steps.create-zip.outputs.zip-path }}
+          asset_name: ${{ steps.create-zip.outputs.zip-filename }}
