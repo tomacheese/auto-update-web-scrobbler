@@ -30,7 +30,6 @@ export class Configuration extends ConfigFramework<IConfiguration> {
     return {
       'server is required': (config) => !!config.server,
       'server is string': (config) => typeof config.server === 'string',
-
       'browser is required': (config) => !!config.browser,
       'browser is object': (config) => typeof config.browser === 'object',
       'browser.levelDbPath is array': (config) =>
