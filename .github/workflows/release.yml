@@ -88,6 +88,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu, windows, macos]
+      fail-fast: false
 
     steps:
       - name: 📥 Check out the repo
@@ -154,8 +155,9 @@ jobs:
             npm run package
           fi
 
-      - name: 📦 Create zip
+      - name: 📦 Create zip (for ubuntu or macos)
         id: create-zip
+        if: ${{ matrix.os == 'ubuntu' || matrix.os == 'macos' }}
         run: |
           REPO="${GITHUB_REPOSITORY#"${GITHUB_REPOSITORY_OWNER}/"}"
           ZIP_FILENAME=${REPO}_${{ needs.calc-version.outputs.tag }}-${{ matrix.os }}.zip
@@ -165,6 +167,18 @@ jobs:
           echo "zip-path=${ZIP_PATH}" >> $GITHUB_OUTPUT
           echo "zip-filename=${ZIP_FILENAME}" >> $GITHUB_OUTPUT
 
+      - name: 📦 Create zip (for windows)
+        id: create-zip-windows
+        if: ${{ matrix.os == 'windows' }}
+        shell: powershell
+        run: |
+          $REPO = "${env:GITHUB_REPOSITORY}".Split("/")[-1]
+          $ZIP_FILENAME = "${REPO}_${env:VERSION}-${env:OS}.zip"
+          $ZIP_PATH = "${env:GITHUB_WORKSPACE}\output\$ZIP_FILENAME"
+          Compress-Archive -Path "${env:GITHUB_WORKSPACE}\output\*" -DestinationPath $ZIP_PATH
+          echo "zip-path=$ZIP_PATH" >> $env:GITHUB_ENV
+          echo "zip-filename=$ZIP_FILENAME" >> $env:GITHUB_ENV
+
       - name: 📂 ls
         run: |
           pwd
@@ -172,7 +186,16 @@ jobs:
 
       - name: 📤 Upload Release Asset
         uses: shogo82148/actions-upload-release-asset@v1.7.5
+        if: ${{ matrix.os == 'ubuntu' || matrix.os == 'macos' }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ${{ steps.create-zip.outputs.zip-path }}
           asset_name: ${{ steps.create-zip.outputs.zip-filename }}
+
+      - name: 📤 Upload Release Asset
+        uses: shogo82148/actions-upload-release-asset@v1.7.5
+        if: ${{ matrix.os == 'windows' }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ${{ steps.create-zip-windows.outputs.zip-path }}
+          asset_name: ${{ steps.create-zip-windows.outputs.zip-filename }}
