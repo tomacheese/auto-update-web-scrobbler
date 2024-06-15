@@ -173,11 +173,14 @@ jobs:
         shell: powershell
         run: |
           $REPO = "${env:GITHUB_REPOSITORY}".Split("/")[-1]
-          $ZIP_FILENAME = "${REPO}_${env:VERSION}-${env:OS}.zip"
+          $ZIP_FILENAME = "${REPO}_${env:VERSION}-${env:FILE_OS}.zip"
           $ZIP_PATH = "${env:GITHUB_WORKSPACE}\output\$ZIP_FILENAME"
           Compress-Archive -Path "${env:GITHUB_WORKSPACE}\output\*" -DestinationPath $ZIP_PATH
           echo "zip-path=$ZIP_PATH" >> $env:GITHUB_ENV
           echo "zip-filename=$ZIP_FILENAME" >> $env:GITHUB_ENV
+        env:
+          VERSION: ${{ needs.calc-version.outputs.tag }}
+          FILE_OS: ${{ matrix.os }}
 
       - name: 📂 ls
         run: |
