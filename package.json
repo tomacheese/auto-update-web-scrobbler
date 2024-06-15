@@ -1,7 +1,7 @@
 {
   "name": "auto-update-web-scrobbler",
-  "version": "0.0.0",
-  "description": "",
+  "version": "1.0.0",
+  "description": "Synchronize Web Scrobbler LevelDB file with fetch-youtube-bgm",
   "homepage": "https://github.com/tomacheese/auto-update-web-scrobbler",
   "bugs": {
     "url": "https://github.com/tomacheese/auto-update-web-scrobbler/issues"
