@@ -1,6 +1,6 @@
 # auto-update-web-scrobbler
 
-Synchronize Web Scrobbler LevelDB file with [tomacheese/fetch-youtube-bgm](https://github.com/tomacheese/fetch-youtube-bgm).
+Synchronize [Web Scrobbler](https://web-scrobbler.com/) LevelDB file with [tomacheese/fetch-youtube-bgm](https://github.com/tomacheese/fetch-youtube-bgm).
 
 ## Features
 
