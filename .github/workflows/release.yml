@@ -76,11 +76,14 @@ jobs:
 
   upload-package:
     name: Upload package ${{ needs.calc-version.outputs.tag }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}-latest
     if: github.event.pull_request.merged == true
     needs:
       - calc-version
       - release
+    strategy:
+      matrix:
+        os: [ubuntu, windows, macos]
 
     steps:
       - name: 📥 Check out the repo
@@ -151,7 +154,7 @@ jobs:
         id: create-zip
         run: |
           REPO="${GITHUB_REPOSITORY#"${GITHUB_REPOSITORY_OWNER}/"}"
-          ZIP_FILENAME=${REPO}_${{ needs.calc-version.outputs.tag }}.zip
+          ZIP_FILENAME=${REPO}_${{ needs.calc-version.outputs.tag }}-${{ matrix.os }}.zip
           ZIP_PATH=$(pwd)/output/${ZIP_FILENAME}
           cd output
           zip -r ${ZIP_PATH} ./*
