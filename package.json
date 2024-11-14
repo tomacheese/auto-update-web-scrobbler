@@ -31,7 +31,7 @@
     "test": "jest --runInBand --passWithNoTests --detectOpenHandles --forceExit"
   },
   "devDependencies": {
-    "@book000/eslint-config": "1.7.89",
+    "@book000/eslint-config": "1.7.90",
     "@book000/node-utils": "1.13.342",
     "@types/jest": "29.5.14",
     "@types/lodash": "4.17.13",
