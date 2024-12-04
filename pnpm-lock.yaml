@@ -27,8 +27,8 @@ importers:
         specifier: 0.38.3
         version: 0.38.3
       axios:
-        specifier: 1.7.8
-        version: 1.7.8
+        specifier: 1.7.9
+        version: 1.7.9
       eslint:
         specifier: 9.16.0
         version: 9.16.0
