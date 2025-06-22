@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@book000/eslint-config": "1.9.7",
-    "@book000/node-utils": "1.18.23",
+    "@book000/node-utils": "1.18.24",
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.18",
     "@types/node": "22.15.32",
