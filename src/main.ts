@@ -154,8 +154,7 @@ async function updateServer(
   const diffTracks = mergedTracks.filter((track) => {
     const serverTrack = serverTracks.find((t) => t.vid === track.vid)
     return (
-      !serverTrack ||
-      serverTrack.track !== track.track ||
+      serverTrack?.track !== track.track ||
       serverTrack.artist !== track.artist ||
       serverTrack.album !== track.album ||
       serverTrack.albumArtist !== track.albumArtist
