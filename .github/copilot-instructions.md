@@ -43,4 +43,8 @@ pnpm install
 ## ドキュメント更新
 
 ## リポジトリ固有
-- 目的: Synchronize [Web Scrobbler](https://web-scrobbler.com/) LevelDB file with [tomacheese/fetch-youtube-bgm](https://github.com/tomacheese/fetch-youtube-bgm).
+- 概要: Synchronize Web Scrobbler LevelDB file with tomacheese/fetch-youtube-bgm.
+- 主要言語: TypeScript
+- パッケージマネージャー: pnpm
+- 主なエントリポイント: `src/main.ts`
+- CI 定義: `.github/workflows/` を参照
