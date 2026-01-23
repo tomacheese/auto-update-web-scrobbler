@@ -25,3 +25,4 @@
 - ログに機密情報を出力しない。
 
 ## リポジトリ固有
+- 目的: Synchronize [Web Scrobbler](https://web-scrobbler.com/) LevelDB file with [tomacheese/fetch-youtube-bgm](https://github.com/tomacheese/fetch-youtube-bgm).

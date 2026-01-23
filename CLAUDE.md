@@ -95,3 +95,4 @@ pnpm install
 6. PR 本文の崩れがないことを確認する。
 
 ## リポジトリ固有
+- 目的: Synchronize [Web Scrobbler](https://web-scrobbler.com/) LevelDB file with [tomacheese/fetch-youtube-bgm](https://github.com/tomacheese/fetch-youtube-bgm).
