@@ -1,32 +1,21 @@
 # GitHub Copilot Instructions
 
 ## プロジェクト概要
-
-- 目的: Synchronize [Web Scrobbler](https://web-scrobbler.com/) LevelDB file with
-  [tomacheese/fetch-youtube-bgm](https://github.com/tomacheese/fetch-youtube-bgm).
-- 主な機能: When playing a YouTube video, the title and artist set in
-  fetch-youtube-bgm will correctly scrobble. / It has a synchronization feature
-  with fetch-youtube-bgm, so changes made in either fetch-youtube-bgm or Web
-  Scrobbler will be correctly merged with the registration information. / ⚠️ Due
-  to LevelDB specifications, data cannot be updated while the browser is
-  running.
+- 目的: Synchronize Web Scrobbler LevelDB file with fetch-youtube-bgm
+- 主な機能: When playing a YouTube video, the title and artist set in fetch-youtube-bgm will correctly scrobble. / It has a synchronization feature with fetch-youtube-bgm, so changes made in either fetch-youtube-bgm or Web Scrobbler will be correctly merged with the registration information. / ⚠️ Due to LevelDB specifications, data cannot be updated while the browser is running.
 
 ## 共通ルール
-
 - 会話は日本語で行う。
 - PR とコミットは Conventional Commits に従う。
-- PR タイトルとコミット本文の言語: PR タイトルは Conventional Commits 形式（英語推奨）。PR 本文は日本語。コミットは
-  Conventional Commits 形式（description は日本語）。
+- PR タイトルとコミット本文の言語: PR タイトルは Conventional Commits 形式（英語推奨）。PR 本文は日本語。コミットは Conventional Commits 形式（description は日本語）。
 - 日本語と英数字の間には半角スペースを入れる。
 - 既存のプロジェクトルールがある場合はそれを優先する。
 
 ## 技術スタック
-
-- 言語: JavaScript
-- パッケージマネージャー: pnpm 優先（ロックファイルに従う）。
+- 言語: TypeScript
+- パッケージマネージャー: pnpm
 
 ## コーディング規約
-
 - フォーマット: 既存設定（ESLint / Prettier / formatter）に従う。
 - 命名規則: 既存のコード規約に従う。
 - Lint / Format: 既存の Lint / Format 設定に従う。
@@ -36,30 +25,28 @@
 - 関数やインターフェースには docstring（JSDoc など）を記載する。
 
 ## 開発コマンド
-
 ```bash
 # 依存関係のインストール
 pnpm install
 
-# 開発 / テスト / Lint は README を確認してください
+# 開発
+pnpm dev
+
+# テスト
+pnpm test
+
+# Lint
+pnpm lint
 ```
 
 ## テスト方針
-
-- テストフレームワーク: Jest
+- テストフレームワーク: 未設定（README を確認してください）
 - 新機能や修正には適切なテストを追加する。
 
 ## セキュリティ / 機密情報
-
 - 認証情報やトークンはコミットしない。
 - ログに機密情報を出力しない。
 
 ## ドキュメント更新
 
 ## リポジトリ固有
-
-- 概要: Synchronize Web Scrobbler LevelDB file with tomacheese/fetch-youtube-bgm.
-- 主要言語: TypeScript
-- パッケージマネージャー: pnpm
-- 主なエントリポイント: `src/main.ts`
-- CI 定義: `.github/workflows/` を参照
