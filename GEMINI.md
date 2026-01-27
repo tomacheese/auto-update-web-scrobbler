@@ -10,11 +10,11 @@
 
 ## 共通ルール
 - 会話は日本語で行う
-- コミットメッセージは Conventional Commits に従い、説明文は日本語とする
+- コミットメッセージは [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) に従い、説明文は日本語とする
 - 日本語と英数字の間には半角スペースを挿入する
 
 ## プロジェクト概要
-- 目的: Web Scrobber の LevelDB ファイルと fetch-youtube-bgm サーバのトラック情報を同期する
+- 目的: Web Scrobbler の LevelDB ファイルと fetch-youtube-bgm サーバのトラック情報を同期する
 - 主な機能: LevelDB からのデータ読み書き、API 通信、データのマージロジック
 
 ## コーディング規約

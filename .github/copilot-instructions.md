@@ -1,9 +1,9 @@
 # GitHub Copilot Instructions
 
 ## プロジェクト概要
-- 目的: Web Scrobber の LevelDB ファイルと fetch-youtube-bgm サーバのトラック情報を同期する
+- 目的: Web Scrobbler の LevelDB ファイルと fetch-youtube-bgm サーバのトラック情報を同期する
 - 主な機能:
-  - ローカルの Web Scrobber LevelDB からのトラック情報取得
+  - ローカルの Web Scrobbler LevelDB からのトラック情報取得
   - fetch-youtube-bgm API からのトラック情報取得
   - トラック情報のマージと同期（サーバ・ローカル双方への反映）
 - 対象ユーザー: 開発者、音楽管理ユーザー

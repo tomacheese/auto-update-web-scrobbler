@@ -11,9 +11,9 @@
 5. 他エージェントによるレビュー可否を示す
 
 ## プロジェクト概要
-- 目的: Web Scrobber の LevelDB ファイルと fetch-youtube-bgm サーバのトラック情報を同期する
+- 目的: Web Scrobbler の LevelDB ファイルと fetch-youtube-bgm サーバのトラック情報を同期する
 - 主な機能:
-  - ローカルの Web Scrobber LevelDB からのトラック情報取得
+  - ローカルの Web Scrobbler LevelDB からのトラック情報取得
   - fetch-youtube-bgm API からのトラック情報取得
   - トラック情報のマージと同期（サーバ・ローカル双方への反映）
 
@@ -70,7 +70,7 @@ pnpm test
 - `src/main.ts`: メインエントリーポイント。同期ロジックの核となる部分。
 - `src/config.ts`: 設定管理クラス。`data/config.json` を読み込む。
 - `src/fyb.ts`: fetch-youtube-bgm API クライアント。
-- `src/web-scrobber.ts`: Web Scrobber の LevelDB 操作クラス。
+- `src/web-scrobber.ts`: Web Scrobbler の LevelDB 操作クラス。
 
 ## 実装パターン
 - 設定管理: `@book000/node-utils` の `ConfigFramework` を継承して実装する。
