@@ -17,7 +17,7 @@ defaults:
 
 # 同一 PR の古い run を自動キャンセルして run の積み上がりを防ぐ
 concurrency:
-  # event_name を含めることで pull_request と pull_request_target のキャンセルを独立させる
+  # event_name を含めることで将来 pull_request トリガーが追加された場合のキャンセル競合を防ぐ（防衛的コーディング）
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
