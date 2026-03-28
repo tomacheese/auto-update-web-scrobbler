@@ -65,7 +65,7 @@ jobs:
     # closed かつ未マージの場合はジョブをスキップする（承認ゲートが永久 pending になるのを防ぐ）
     if: always() && (github.event.action != 'closed' || github.event.pull_request.merged == true)
     # フォーク PR かつ closed イベント以外の場合のみ Environment で手動承認が必要（同一リポジトリからの PR・closed イベントは不要）
-    environment: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && github.event.action != 'closed' && 'fork-pr-build' || null }}
+    environment: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && github.event.action != 'closed' && 'fork-pr-build' || '' }}
     permissions:
       contents: write
 
