@@ -68,8 +68,8 @@ export class WebScrobberExtension {
       const database = await this.getLevelDatabase(this.writeLevelDbPath)
       await database.close()
       return true
-    } catch (error) {
-      logger.error('Failed to open database', error as Error)
+    } catch (err) {
+      logger.error('Failed to open database', err as Error)
       return false
     }
   }

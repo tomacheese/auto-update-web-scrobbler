@@ -205,8 +205,8 @@ async function main() {
     )
 
     logger.info('✅ Done')
-  } catch (error) {
-    logger.error('❌ Failed to update', error as Error)
+  } catch (err) {
+    logger.error('❌ Failed to update', err as Error)
   }
 }
 
