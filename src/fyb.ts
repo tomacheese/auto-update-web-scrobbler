@@ -1,4 +1,4 @@
-import axios from 'axios'
+// axios から fetch へ移行
 
 export interface ApiTrack {
   vid: string
@@ -18,19 +18,20 @@ export class FetchYoutubeBgmApi {
   }
 
   public async getTracks(): Promise<ApiTrack[]> {
-    const response = await axios.get<ApiGetTracksResponse>(
-      `${this.serverUrl}/api/tracks/`
-    )
-    return response.data
+    const res = await fetch(`${this.serverUrl}/api/tracks/`)
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`)
+    const data = (await res.json()) as ApiGetTracksResponse
+    return data
   }
 
   public async patchTrack(track: ApiTrack): Promise<void> {
-    const response = await axios.patch(
-      `${this.serverUrl}/api/tracks/${track.vid}`,
-      track
-    )
-
-    if (response.status !== 204) {
+    const res = await fetch(`${this.serverUrl}/api/tracks/${track.vid}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(track),
+    })
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`)
+    if (res.status !== 204) {
       throw new Error('Failed to patch track')
     }
   }
