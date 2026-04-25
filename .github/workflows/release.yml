@@ -231,7 +231,7 @@ jobs:
           ls -la output
 
       - name: 📤 Upload Release Asset
-        uses: shogo82148/actions-upload-release-asset@v1.10.0
+        uses: shogo82148/actions-upload-release-asset@v1.10.1
         if: ${{ matrix.os == 'ubuntu' || matrix.os == 'macos' }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
@@ -239,7 +239,7 @@ jobs:
           asset_name: ${{ steps.create-zip.outputs.zip-filename }}
 
       - name: 📤 Upload Release Asset
-        uses: shogo82148/actions-upload-release-asset@v1.10.0
+        uses: shogo82148/actions-upload-release-asset@v1.10.1
         if: ${{ matrix.os == 'windows' }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
