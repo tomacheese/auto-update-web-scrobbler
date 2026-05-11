@@ -1,0 +1,4 @@
+allowBuilds:
+  classic-level: true
+  esbuild: true
+  unrs-resolver: true
