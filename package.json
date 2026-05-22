@@ -20,7 +20,7 @@
     "package": "run-z clean compile packing",
     "packing": "ncc build ./dist/main.js -o output/ -m",
     "compile": "tsc -p .",
-    "clean": "rimraf dist output",
+    "clean": "rimraf dist output tsconfig.tsbuildinfo",
     "fix:prettier": "prettier --write src",
     "lint:tsc": "tsc",
     "lint:eslint": "eslint . -c eslint.config.mjs",
