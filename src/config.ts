@@ -10,7 +10,7 @@ export interface IConfiguration {
    * - GET `/api/tracks/`: すべてのトラック情報を取得
    * - PATCH `/api/tracks/{vid}`: 指定した動画のトラック情報を追加・更新
    *
-   * @example http://example.com
+   * @example https://example.com
    */
   server: string
 
