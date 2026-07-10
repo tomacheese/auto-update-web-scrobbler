@@ -1,76 +1,40 @@
-# GitHub Copilot Instructions
+# GitHub Copilot コードレビュー指示
+
+このファイルは GitHub Copilot のコードレビュー機能向けの指示です。以下の観点でレビューしてください。
 
 ## プロジェクト概要
-- 目的: Web Scrobbler の LevelDB ファイルと fetch-youtube-bgm サーバのトラック情報を同期する
-- 主な機能:
-  - ローカルの Web Scrobbler LevelDB からのトラック情報取得
-  - fetch-youtube-bgm API からのトラック情報取得
-  - トラック情報のマージと同期（サーバ・ローカル双方への反映）
-- 対象ユーザー: 開発者、音楽管理ユーザー
 
-## 共通ルール
-- 会話は日本語で行う。
-- PR とコミットは [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) に従う。
-  - `<type>(<scope>): <description>` 形式
-  - `<description>` は日本語で記載
-- 日本語と英数字の間には半角スペースを入れる。
+Web Scrobbler の LevelDB ファイルと fetch-youtube-bgm サーバのトラック情報を双方向に同期する TypeScript 製 CLI ツールです。ローカルの LevelDB 読み書きと API 通信を伴います。
 
 ## 技術スタック
-- 言語: TypeScript
-- 実行環境: Node.js (tsx)
+
+- 言語: TypeScript (Node.js / tsx 実行)
 - パッケージマネージャー: pnpm
-- 主要ライブラリ:
-  - level (LevelDB 操作)
-  - axios (API 通信)
-  - @book000/node-utils (ユーティリティ、設定管理)
-  - jest (テスト)
+- 主要ライブラリ: `level` (LevelDB 操作)、`axios` (API 通信)、`@book000/node-utils` (設定管理・ロギング)、`jest` + `ts-jest` (テスト)
 
-## コーディング規約
-- TypeScript の `skipLibCheck` は使用しない。
-- 関数やインターフェースには docstring (JSDoc) を日本語で記載する。
-- 既存の命名規則（キャメルケース）とフォーマット（Prettier）に従う。
+## 強制されている規約（違反はフラグする）
 
-## 開発コマンド
-```bash
-# 依存関係のインストール
-pnpm install
+- Prettier に準拠する。設定は `.prettierrc.yml`（セミコロンなし・シングルクォート・`printWidth: 80`・`trailingComma: es5`・`bracketSameLine: true`）。
+- ESLint 設定は `@book000/eslint-config` を継承する（`eslint.config.mjs`）。
+- TypeScript の `skipLibCheck` を有効化しない。
+- 命名はキャメルケース。
+- 関数・インターフェースには JSDoc docstring を日本語で記載する。
 
-# 開発実行 (watch モード)
-pnpm dev
+## レビュー時に重点確認する点
 
-# 通常実行
-pnpm start
+- エラーハンドリング: LevelDB 操作・ネットワーク通信（axios）で例外が握りつぶされていないか、失敗時のログとスキップ処理が適切か。
+- データ破損リスク: LevelDB を直接書き込むため、同期・マージロジックの破壊的操作が既存データを壊さないか。ブラウザ起動中はロック競合で書き込みをスキップする既存挙動を壊していないか。
+- 設定バリデーション: `data/config.json` はユーザー環境依存のため、読み込み時の検証が十分か。
+- 破壊的変更・新機能追加時にテスト（`**/*.test.ts`）が追加・更新されているか。
+- 設定項目の追加・変更時に `src/config.ts` のインターフェースと `README.md` が更新されているか。
 
-# ビルド (コンパイルとパッケージング)
-pnpm package
+## セキュリティ
 
-# TypeScript コンパイル
-pnpm compile
+- API キー・パスワード・トークン等の認証情報がコードにハードコードされていないか。
+- ログに個人情報・認証情報が出力されていないか。
 
-# Lint 実行
-pnpm lint
+## フラグすべきでない既知パターン
 
-# 自動修正実行 (Prettier, ESLint)
-pnpm fix
-
-# テスト実行
-pnpm test
-```
-
-## テスト方針
-- テストフレームワーク: Jest (`ts-jest`)
-- テストファイルは `**/*.test.ts` 形式で配置する。
-- 破壊的な変更を行う場合は必ずテストを追加または更新する。
-
-## セキュリティ / 機密情報
-- API キーやパスワードなどの機密情報は直接コードに記述しない。
-- 設定は `data/config.json` で管理し、テンプレート（存在する場合）を参考にする。
-- ログに個人情報や認証情報を出力しない。
-
-## ドキュメント更新
-- `README.md`: プロジェクトの使用方法や設定方法の変更時に更新。
-- `src/config.ts`: 設定項目の追加・変更時に IConfiguration インターフェースを更新。
-
-## リポジトリ固有
-- LevelDB の操作には `level` ライブラリを使用しており、書き込み時はロックに注意する必要がある。
-- 設定ファイルは `data/config.json` に配置されることが期待されている。
+- ソースコードのコメント・docstring が日本語であること（本プロジェクトの規約であり英語化は不要）。
+- エラーメッセージ等に絵文字が含まれること（既存スタイルに合わせた意図的なもの）。
+- セミコロンを付けないコードスタイル（Prettier 設定による）。
