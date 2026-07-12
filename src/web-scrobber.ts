@@ -43,7 +43,6 @@ export class WebScrobberExtension {
   public async setTracks(tracks: ApiTrack[]): Promise<void> {
     const database = await this.getLevelDatabase(this.writeLevelDbPath)
 
-    // eslint-disable-next-line unicorn/no-array-reduce
     const newTracks = tracks.reduce<WebScrobberTracks>((accumulator, track) => {
       return {
         ...accumulator,
