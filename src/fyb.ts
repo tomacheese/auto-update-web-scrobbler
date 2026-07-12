@@ -19,27 +19,27 @@ export class FetchYoutubeBgmApi {
 
   public async getTracks(): Promise<ApiTrack[]> {
     const url = `${this.serverUrl}/api/tracks/`
-    const res = await fetch(url)
-    if (!res.ok)
+    const response = await fetch(url)
+    if (!response.ok)
       throw new Error(
-        `HTTP error: ${res.status} ${res.statusText} (GET ${url})`
+        `HTTP error: ${response.status} ${response.statusText} (GET ${url})`
       )
-    const data = (await res.json()) as ApiGetTracksResponse
+    const data = (await response.json()) as ApiGetTracksResponse
     return data
   }
 
   public async patchTrack(track: ApiTrack): Promise<void> {
     const url = `${this.serverUrl}/api/tracks/${track.vid}`
-    const res = await fetch(url, {
+    const response = await fetch(url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(track),
     })
-    if (!res.ok)
+    if (!response.ok)
       throw new Error(
-        `HTTP error: ${res.status} ${res.statusText} (PATCH ${url})`
+        `HTTP error: ${response.status} ${response.statusText} (PATCH ${url})`
       )
-    if (res.status !== 204) {
+    if (response.status !== 204) {
       throw new Error('Failed to patch track')
     }
   }

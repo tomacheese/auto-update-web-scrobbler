@@ -1,6 +1,6 @@
 import { ConfigFramework } from '@book000/node-utils'
 
-export interface IConfiguration {
+export interface IConfig {
   /**
    * トラック管理サーバ（tomacheese/fetch-youtube-bgm）設定
    *
@@ -25,8 +25,8 @@ export interface IConfiguration {
   }
 }
 
-export class Configuration extends ConfigFramework<IConfiguration> {
-  protected validates(): Record<string, (config: IConfiguration) => boolean> {
+export class Config extends ConfigFramework<IConfig> {
+  protected validates(): Record<string, (config: IConfig) => boolean> {
     return {
       'server is required': (config) => !!config.server,
       'server is string': (config) => typeof config.server === 'string',
