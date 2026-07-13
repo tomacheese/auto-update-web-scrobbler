@@ -64,10 +64,12 @@ async function getBrowserTracks(
   const vidSet = new Set<string>()
   const uniqueBrowserTracks: ApiTrack[] = []
   for (const track of browserTracks) {
-    if (!vidSet.has(track.vid)) {
-      vidSet.add(track.vid)
-      uniqueBrowserTracks.push(track)
+    if (vidSet.has(track.vid)) {
+      continue
     }
+
+    vidSet.add(track.vid)
+    uniqueBrowserTracks.push(track)
   }
 
   logger.info(`🔍 Got ${uniqueBrowserTracks.length} tracks from browser(s)`)
@@ -93,17 +95,21 @@ function mergeTracks(
   // サーバにないトラック情報はブラウザから取得したものを使用する
   const vidSet = new Set<string>()
   for (const track of serverTracks) {
-    if (!vidSet.has(track.vid)) {
-      vidSet.add(track.vid)
-      mergedTracks.push(track)
+    if (vidSet.has(track.vid)) {
+      continue
     }
+
+    vidSet.add(track.vid)
+    mergedTracks.push(track)
   }
 
   for (const track of browserTracks) {
-    if (!vidSet.has(track.vid)) {
-      vidSet.add(track.vid)
-      mergedTracks.push(track)
+    if (vidSet.has(track.vid)) {
+      continue
     }
+
+    vidSet.add(track.vid)
+    mergedTracks.push(track)
   }
 
   logger.info(`🔀 Merged ${mergedTracks.length} tracks`)
