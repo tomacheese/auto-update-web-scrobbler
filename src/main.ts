@@ -160,15 +160,12 @@ async function updateServer(
   const diffTracks = mergedTracks.filter((track) => {
     const serverTrack = serverTracks.find((t) => t.vid === track.vid)
     // サーバにトラックが存在しない場合、または各フィールドが異なる場合は更新対象
-    if (!serverTrack) {
-      return true
-    }
-    return (
-      serverTrack.track !== track.track ||
-      serverTrack.artist !== track.artist ||
-      serverTrack.album !== track.album ||
-      serverTrack.albumArtist !== track.albumArtist
-    )
+    return serverTrack
+      ? serverTrack.track !== track.track ||
+          serverTrack.artist !== track.artist ||
+          serverTrack.album !== track.album ||
+          serverTrack.albumArtist !== track.albumArtist
+      : true
   })
   logger.info(`🆙 Update ${diffTracks.length} tracks`)
   for (const track of diffTracks) {
