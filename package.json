@@ -34,7 +34,7 @@
     "@book000/eslint-config": "1.16.71",
     "@book000/node-utils": "1.25.151",
     "@types/jest": "30.0.0",
-    "@types/lodash": "4.17.25",
+    "@types/lodash": "4.17.26",
     "@types/node": "24.19.2",
     "@vercel/ncc": "0.45.0",
     "eslint": "10.12.0",
