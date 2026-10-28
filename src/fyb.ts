@@ -8,8 +8,6 @@ export interface ApiTrack {
   albumArtist?: string | null
 }
 
-type ApiGetTracksResponse = ApiTrack[]
-
 export class FetchYoutubeBgmApi {
   private readonly serverUrl: string
 
@@ -24,7 +22,7 @@ export class FetchYoutubeBgmApi {
       throw new Error(
         `HTTP error: ${res.status} ${res.statusText} (GET ${url})`
       )
-    const data = (await res.json()) as ApiGetTracksResponse
+    const data = (await res.json()) as ApiTrack[]
     return data
   }
 
