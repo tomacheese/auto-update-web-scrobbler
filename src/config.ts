@@ -2,24 +2,22 @@ import { ConfigFramework } from '@book000/node-utils'
 
 export interface IConfiguration {
   /**
-   * トラック管理サーバ（tomacheese/fetch-youtube-bgm）設定
+   * Base URL of the track server (tomacheese/fetch-youtube-bgm).
    *
-   * サーバのトラック情報とブラウザのトラック情報を同期するための、エンドポイントを指定します。
+   * Used to sync the server's tracks with the browser's tracks.
    *
-   * エンドポイント:
-   * - GET `/api/tracks/`: すべてのトラック情報を取得
-   * - PATCH `/api/tracks/{vid}`: 指定した動画のトラック情報を追加・更新
+   * See `src/fyb.ts` for the endpoints used.
    *
    * @example https://example.com
    */
   server: string
 
   /**
-   * ブラウザ設定
+   * Browser settings.
    */
   browser: {
     /**
-     * 拡張機能「Web Scrobber」についての設定です。Web Scrobberが管理する LevelDB のパスを指定します。
+     * Paths of the LevelDB directories managed by the Web Scrobbler extension.
      */
     levelDbPath: string[]
   }

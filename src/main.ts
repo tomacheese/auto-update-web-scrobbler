@@ -4,9 +4,9 @@ import { ApiTrack, FetchYoutubeBgmApi } from './fyb'
 import { WebScrobberExtension } from './web-scrobber'
 
 /**
- * 設定を読み込む
+ * Loads and validates `data/config.json`.
  *
- * @returns 設定。設定が不正な場合は `null` を返す
+ * @returns The configuration, or `null` if it is invalid (sets `process.exitCode` to 1)
  */
 function loadConfiguration(): Configuration | null {
   const logger = Logger.configure('loadConfiguration')
@@ -24,12 +24,6 @@ function loadConfiguration(): Configuration | null {
   return config
 }
 
-/**
- * サーバからトラック情報を取得する
- *
- * @param server サーバのURL
- * @returns トラック情報
- */
 async function getServerTracks(server: string): Promise<ApiTrack[]> {
   const logger = Logger.configure('getServerTracks')
   logger.info('🔍 Get tracks from server')
@@ -40,10 +34,9 @@ async function getServerTracks(server: string): Promise<ApiTrack[]> {
 }
 
 /**
- * ブラウザからトラック情報を取得する
+ * Reads the tracks from the browser LevelDB directories.
  *
- * @param levelDatabasePaths ブラウザの LevelDB のパス
- * @returns トラック情報
+ * @returns Tracks de-duplicated by `vid` (the first occurrence wins)
  */
 async function getBrowserTracks(
   levelDatabasePaths: string[]
@@ -60,7 +53,6 @@ async function getBrowserTracks(
     browserTracks.push(...tracks)
   }
 
-  // 重複を削除
   const vidSet = new Set<string>()
   const uniqueBrowserTracks: ApiTrack[] = []
   for (const track of browserTracks) {
@@ -77,11 +69,10 @@ async function getBrowserTracks(
 }
 
 /**
- * トラック情報をマージする
+ * Merges server and browser tracks by `vid`.
  *
- * @param serverTracks サーバから取得したトラック情報
- * @param browserTracks ブラウザから取得したトラック情報
- * @returns マージされたトラック情報
+ * @param serverTracks Tracks from the server (take precedence)
+ * @param browserTracks Tracks from the browser (used only for `vid`s missing on the server)
  */
 function mergeTracks(
   serverTracks: ApiTrack[],
@@ -91,8 +82,6 @@ function mergeTracks(
   logger.info('🔀 Merge tracks')
   const mergedTracks: ApiTrack[] = []
 
-  // サーバのトラック情報を優先
-  // サーバにないトラック情報はブラウザから取得したものを使用する
   const vidSet = new Set<string>()
   for (const track of serverTracks) {
     if (vidSet.has(track.vid)) {
@@ -117,12 +106,10 @@ function mergeTracks(
 }
 
 /**
- * ブラウザのトラック情報を更新する。
+ * Writes the merged tracks to each browser LevelDB.
  *
- * LevelDB はロックされていると書き込みができない。書き込みできない場合はスキップする。
+ * A LevelDB that is locked (e.g. the browser is running) cannot be written, so it is skipped.
  *
- * @param levelDatabasePaths ブラウザの LevelDB のパス
- * @param mergedTracks マージされたトラック情報
  */
 async function updateBrowser(
   levelDatabasePaths: string[],
@@ -144,11 +131,7 @@ async function updateBrowser(
 }
 
 /**
- * サーバのトラック情報を更新する
- *
- * @param fyb FetchYoutubeBgmApi
- * @param mergedTracks マージされたトラック情報
- * @param serverTracks サーバから取得したトラック情報
+ * Pushes new or changed tracks to the server.
  */
 async function updateServer(
   fyb: FetchYoutubeBgmApi,
@@ -159,7 +142,6 @@ async function updateServer(
   logger.info('🆙 Updating server')
   const diffTracks = mergedTracks.filter((track) => {
     const serverTrack = serverTracks.find((t) => t.vid === track.vid)
-    // サーバにトラックが存在しない場合、または各フィールドが異なる場合は更新対象
     return (
       serverTrack?.track !== track.track ||
       serverTrack.artist !== track.artist ||
@@ -174,9 +156,6 @@ async function updateServer(
   }
 }
 
-/**
- * メイン処理
- */
 async function main() {
   const logger = Logger.configure('main')
 
@@ -190,17 +169,13 @@ async function main() {
     const server = config.get('server')
     const levelDatabasePaths = config.get('browser').levelDbPath
 
-    // Get tracks from server & browser
     const serverTracks = await getServerTracks(server)
     const browserTracks = await getBrowserTracks(levelDatabasePaths)
 
-    // Merge tracks
     const mergedTracks = mergeTracks(serverTracks, browserTracks)
 
-    // Update browser
     await updateBrowser(levelDatabasePaths, mergedTracks)
 
-    // Update server
     await updateServer(
       new FetchYoutubeBgmApi(server),
       mergedTracks,

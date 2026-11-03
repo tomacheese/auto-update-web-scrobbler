@@ -21,7 +21,7 @@ export class WebScrobberExtension {
   constructor(levelDatabasePath: string) {
     this.writeLevelDbPath = levelDatabasePath
 
-    // ロックされているファイルを読み込むとエラーになるため、一時的にコピーして読み込む
+    // Reading a locked LevelDB fails, so read from a temporary copy instead
     const temporaryDirectory = tmpdir()
     const temporaryLevelDatabase = `${temporaryDirectory}/auto-update-web-scrobber/level-db-${Date.now()}`
     this.readLevelDbPath = temporaryLevelDatabase

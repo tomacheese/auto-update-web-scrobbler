@@ -22,10 +22,10 @@ Synchronize [Web Scrobbler](https://web-scrobbler.com/) LevelDB file with [tomac
 
 ### 1. Download and extract the package Zip for your OS
 
-Download the appropriate Zip file for your OS from the [release page](https://github.com/tomacheese/auto-update-web-scrobbler/releases).
+Download the appropriate zip file for your OS from the [release page](https://github.com/tomacheese/auto-update-web-scrobbler/releases).
 
-- Windows: `auto-update-web-scrobbler_v{X.Y.Z}-ubuntu.zip`
-- macOS: `auto-update-web-scrobbler_v{X.Y.Z}-ubuntu.zip`
+- Windows: `auto-update-web-scrobbler_v{X.Y.Z}-windows.zip`
+- macOS: `auto-update-web-scrobbler_v{X.Y.Z}-macos.zip`
 - Ubuntu: `auto-update-web-scrobbler_v{X.Y.Z}-ubuntu.zip`
 
 After downloading, extract the file to a folder of your choice.
@@ -36,7 +36,7 @@ Create `data/config.json` and write the following JSON. Note that the strings en
 
 - `<fetch-youtube-bgm server url>`: Enter the URL where [tomacheese/fetch-youtube-bgm](https://github.com/tomacheese/fetch-youtube-bgm) is running.
   - Access `<fetch-youtube-bgm server url>/api/tracks` and verify that the track information list is displayed correctly in JSON format.
-- `<extension settings folder path>`: Specify the configuration folder for the Web Scrobbler extension. Backslashes (`\`) should be escape (`\\`).
+- `<extension settings folder path>`: Specify the configuration folder for the Web Scrobbler extension. Backslashes (`\`) must be escaped (`\\`).
   - Default Folder in Chrome on Windows: `C:\Users\USERNAME\AppData\Local\Google\Chrome\User Data\Default\Local Extension Settings\hhinaapppaileiechjoiifaancjggfjm\`
   - Multiple folder paths can be specified.
 
@@ -53,7 +53,7 @@ Create `data/config.json` and write the following JSON. Note that the strings en
 
 ### 3. Run index.js
 
-Execute the following command to run `index.js
+Execute the following command to run `index.js`:
 
 ```shell
 node index.js

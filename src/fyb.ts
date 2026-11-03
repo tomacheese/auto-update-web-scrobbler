@@ -1,5 +1,3 @@
-// axios から fetch へ移行
-
 export interface ApiTrack {
   vid: string
   track: string
