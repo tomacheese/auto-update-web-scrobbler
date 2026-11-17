@@ -46,11 +46,15 @@ async function getBrowserTracks(
   const browserTracks: ApiTrack[] = []
   for (const levelDatabasePath of levelDatabasePaths) {
     const extension = new WebScrobberExtension(levelDatabasePath)
-    const tracks = await extension.getTracks()
-    logger.info(
-      `👀 Got ${tracks.length} tracks from browser: ${levelDatabasePath}`
-    )
-    browserTracks.push(...tracks)
+    try {
+      const tracks = await extension.getTracks()
+      logger.info(
+        `👀 Got ${tracks.length} tracks from browser: ${levelDatabasePath}`
+      )
+      browserTracks.push(...tracks)
+    } finally {
+      extension.destroy()
+    }
   }
 
   const vidSet = new Set<string>()
@@ -119,14 +123,16 @@ async function updateBrowser(
   for (const levelDatabasePath of levelDatabasePaths) {
     logger.info(`🔄 Updating browser: ${levelDatabasePath}`)
     const extension = new WebScrobberExtension(levelDatabasePath)
-    if (!(await extension.isWritable())) {
-      logger.warn(`🔄 LevelDB is not writable. Skip: ${levelDatabasePath}`)
-      continue
+    try {
+      if (!(await extension.isWritable())) {
+        logger.warn(`🔄 LevelDB is not writable. Skip: ${levelDatabasePath}`)
+        continue
+      }
+
+      await extension.setTracks(mergedTracks)
+    } finally {
+      extension.destroy()
     }
-
-    await extension.setTracks(mergedTracks)
-
-    extension.destroy()
   }
 }
 

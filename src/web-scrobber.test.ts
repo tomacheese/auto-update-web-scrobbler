@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -115,4 +116,71 @@ describe('WebScrobberExtension', () => {
     const tracks = await createExtension().getTracks()
     expect(tracks).toEqual([serverTrack, browserOnlyTrack])
   })
+})
+
+let directory: string
+let databasePath: string
+
+beforeEach(async () => {
+  directory = fs.mkdtempSync(path.join(os.tmpdir(), 'scrobbler-test-'))
+  databasePath = path.join(directory, 'database')
+  const database = new Level<string, object>(databasePath, {
+    valueEncoding: 'json',
+  })
+  await database.open()
+  await database.close()
+})
+
+afterEach(() => {
+  jest.restoreAllMocks()
+  fs.rmSync(directory, { recursive: true, force: true })
+})
+
+test('closes the read database on early return before removing the copy', async () => {
+  const close = jest.spyOn(Level.prototype, 'close')
+  const extension = new WebScrobberExtension(databasePath)
+  await expect(extension.getTracks()).resolves.toEqual([])
+  expect(close).toHaveBeenCalledTimes(1)
+  extension.destroy()
+})
+
+test('closes the write database when a write fails', async () => {
+  const close = jest.spyOn(Level.prototype, 'close')
+  jest
+    .spyOn(Level.prototype, 'put')
+    .mockRejectedValueOnce(new Error('write failed'))
+  const extension = new WebScrobberExtension(databasePath)
+  try {
+    await expect(extension.setTracks([])).rejects.toThrow('write failed')
+    expect(close).toHaveBeenCalledTimes(1)
+    const database = new Level(databasePath)
+    await database.open()
+    await database.close()
+  } finally {
+    extension.destroy()
+  }
+})
+
+test('closes the write database after a successful write', async () => {
+  const close = jest.spyOn(Level.prototype, 'close')
+  const extension = new WebScrobberExtension(databasePath)
+  try {
+    await extension.setTracks([])
+    expect(close).toHaveBeenCalledTimes(1)
+  } finally {
+    extension.destroy()
+  }
+})
+
+test('leaves the original lock intact when the database is locked', async () => {
+  const database = new Level(databasePath)
+  await database.open()
+  const extension = new WebScrobberExtension(databasePath)
+  try {
+    await expect(extension.isWritable()).resolves.toBe(false)
+    await expect(database.put('key', 'value')).resolves.toBeUndefined()
+  } finally {
+    extension.destroy()
+    await database.close()
+  }
 })

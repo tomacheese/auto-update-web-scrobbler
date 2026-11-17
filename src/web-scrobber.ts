@@ -3,6 +3,7 @@ import { Level } from 'level'
 import lodash from 'lodash'
 import { tmpdir } from 'node:os'
 import fs from 'node:fs'
+import path from 'node:path'
 import { Logger } from '@book000/node-utils'
 
 interface WebScrobberTrack {
@@ -21,12 +22,15 @@ export class WebScrobberExtension {
   constructor(levelDatabasePath: string) {
     this.writeLevelDbPath = levelDatabasePath
 
-    // Reading a locked LevelDB fails, so read from a temporary copy instead
-    const temporaryDirectory = tmpdir()
-    const temporaryLevelDatabase = `${temporaryDirectory}/auto-update-web-scrobber/level-db-${Date.now()}`
-    this.readLevelDbPath = temporaryLevelDatabase
-
-    this.copyReadLevelDatabase()
+    this.readLevelDbPath = fs.mkdtempSync(
+      path.join(tmpdir(), 'auto-update-web-scrobber-')
+    )
+    try {
+      this.copyReadLevelDatabase()
+    } catch (error) {
+      this.destroy()
+      throw error
+    }
   }
 
   /**
@@ -70,20 +74,26 @@ export class WebScrobberExtension {
   public async setTracks(tracks: ApiTrack[]): Promise<void> {
     const database = await this.getLevelDatabase(this.writeLevelDbPath)
 
-    const newTracks = tracks.reduce<WebScrobberTracks>((accumulator, track) => {
-      return {
-        ...accumulator,
-        [track.vid]: {
-          track: track.track,
-          artist: track.artist ?? null,
-          album: track.album ?? null,
-          albumArtist: track.albumArtist ?? null,
+    try {
+      const newTracks = tracks.reduce<WebScrobberTracks>(
+        (accumulator, track) => {
+          return {
+            ...accumulator,
+            [track.vid]: {
+              track: track.track,
+              artist: track.artist ?? null,
+              album: track.album ?? null,
+              albumArtist: track.albumArtist ?? null,
+            },
+          }
         },
-      }
-    }, {})
+        {}
+      )
 
-    await database.put('LocalCache', newTracks)
-    await database.close()
+      await database.put('LocalCache', newTracks)
+    } finally {
+      await database.close()
+    }
 
     this.copyReadLevelDatabase()
   }
