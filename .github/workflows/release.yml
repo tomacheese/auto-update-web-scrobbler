@@ -31,7 +31,8 @@ jobs:
     # Post the approval request only for fork PRs and non-closed events (not needed for same-repo PRs or closed events)
     if: github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && github.event.action != 'closed'
     permissions:
-      issues: write  # Needed to post and search PR comments (Issues Comments API); pull-requests: write is not needed
+      issues: write
+      pull-requests: write  # Needed for pull request comment operations
     steps:
       - name: Find existing approval request comment
         id: find-comment
