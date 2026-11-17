@@ -29,15 +29,42 @@ export class WebScrobberExtension {
     this.copyReadLevelDatabase()
   }
 
+  /**
+   * Reads the tracks stored under `LocalCache`.
+   *
+   * @returns The tracks, or an empty array if `LocalCache` does not exist yet
+   * @throws If `LocalCache` is not an object, so the caller never overwrites a corrupted cache
+   */
   public async getTracks(): Promise<ApiTrack[]> {
     const database = await this.getLevelDatabase(this.readLevelDbPath)
 
-    if (!('LocalCache' in database.keys())) {
+    let tracks: unknown
+    try {
+      tracks = await database.get('LocalCache')
+    } catch (error) {
+      await database.close().catch((closeError: unknown) => {
+        Logger.configure('getTracks').warn(
+          '⚠️ Failed to close database',
+          closeError as Error
+        )
+      })
+      throw error
+    }
+    await database.close()
+
+    if (tracks === undefined) {
       return []
     }
-
-    const tracks: WebScrobberTracks = await database.get('LocalCache')
-    return this.convertToApiTracks(tracks)
+    if (
+      typeof tracks !== 'object' ||
+      tracks === null ||
+      Array.isArray(tracks)
+    ) {
+      throw new Error(
+        `Invalid LocalCache value in ${this.writeLevelDbPath}: expected an object but got ${this.describeType(tracks)}`
+      )
+    }
+    return this.convertToApiTracks(tracks as WebScrobberTracks)
   }
 
   public async setTracks(tracks: ApiTrack[]): Promise<void> {
@@ -86,6 +113,13 @@ export class WebScrobberExtension {
     })
     await database.open()
     return database
+  }
+
+  private describeType(value: unknown): string {
+    if (value === null) {
+      return 'null'
+    }
+    return Array.isArray(value) ? 'array' : typeof value
   }
 
   private convertToApiTracks(track: WebScrobberTracks): ApiTrack[] {
