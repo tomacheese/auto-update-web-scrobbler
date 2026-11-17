@@ -156,7 +156,7 @@ async function updateServer(
   }
 }
 
-async function main() {
+export async function main() {
   const logger = Logger.configure('main')
 
   logger.info('🔄 Start')
@@ -185,6 +185,7 @@ async function main() {
     logger.info('✅ Done')
   } catch (error) {
     logger.error('❌ Failed to update', error as Error)
+    process.exitCode = 1
   }
 }
 
