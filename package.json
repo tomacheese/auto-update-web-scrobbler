@@ -28,7 +28,7 @@
     "fix:eslint": "eslint . -c eslint.config.mjs --fix",
     "lint": "run-z lint:prettier,lint:eslint,lint:tsc",
     "lint:prettier": "prettier --check src",
-    "test": "jest --runInBand --passWithNoTests --detectOpenHandles --forceExit"
+    "test": "jest --runInBand --detectOpenHandles --forceExit"
   },
   "devDependencies": {
     "@book000/eslint-config": "1.17.2",
