@@ -94,7 +94,8 @@ jobs:
   release:
     name: Release ${{ needs.calc-version.outputs.tag }}
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
+    # always() stops the skipped post-approval-request ancestor (skipped for every closed/merged event) from skipping this job; require calc-version success explicitly instead
+    if: always() && github.event.pull_request.merged == true && needs.calc-version.result == 'success'
     needs:
       - calc-version
     permissions:
@@ -119,7 +120,8 @@ jobs:
   upload-package:
     name: Upload package ${{ needs.calc-version.outputs.tag }} (${{ matrix.os }})
     runs-on: ${{ matrix.os }}-latest
-    if: github.event.pull_request.merged == true
+    # always() for the same reason as the release job; require both upstream jobs to have succeeded explicitly
+    if: always() && github.event.pull_request.merged == true && needs.calc-version.result == 'success' && needs.release.result == 'success'
     needs:
       - calc-version
       - release
