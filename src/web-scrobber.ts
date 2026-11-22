@@ -15,6 +15,11 @@ interface WebScrobberTrack {
 
 type WebScrobberTracks = Record<string, WebScrobberTrack>
 
+function isLockedError(error: unknown): boolean {
+  const cause = (error as { cause?: { code?: unknown } } | null)?.cause
+  return cause?.code === 'LEVEL_LOCKED'
+}
+
 export class WebScrobberExtension {
   private readonly readLevelDbPath: string
   private readonly writeLevelDbPath: string
@@ -98,16 +103,28 @@ export class WebScrobberExtension {
     this.copyReadLevelDatabase()
   }
 
-  public async isWritable(): Promise<Promise<boolean>> {
-    const logger = Logger.configure('isWritable')
+  /**
+   * Checks whether the write database can be opened.
+   *
+   * @returns `true` if it opens and closes, `false` only if it is locked by another handle (e.g. the browser is running)
+   * @throws For every other open or close failure, so the caller does not mistake it for a lock
+   */
+  public async isWritable(): Promise<boolean> {
+    let database: Level<string, any>
     try {
-      const database = await this.getLevelDatabase(this.writeLevelDbPath)
-      await database.close()
-      return true
+      database = await this.getLevelDatabase(this.writeLevelDbPath)
     } catch (error) {
-      logger.error('Failed to open database', error as Error)
-      return false
+      if (isLockedError(error)) {
+        Logger.configure('isWritable').warn(
+          '⚠️ Database is locked',
+          error as Error
+        )
+        return false
+      }
+      throw error
     }
+    await database.close()
+    return true
   }
 
   public destroy(): void {

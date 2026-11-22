@@ -114,6 +114,7 @@ function mergeTracks(
  *
  * A LevelDB that is locked (e.g. the browser is running) cannot be written, so it is skipped.
  *
+ * @throws If a LevelDB cannot be opened for any reason other than a lock
  */
 async function updateBrowser(
   levelDatabasePaths: string[],

@@ -122,6 +122,17 @@ test('writes browser-only tracks after the server tracks and pushes them to the 
   expect(mockApi.prototype.patchTrack.mock.calls).toEqual([[browserOnlyTrack]])
 })
 
+test('sets a nonzero exit code when the browser database cannot be opened for a non-lock reason', async () => {
+  mockWebScrobberExtension.prototype.isWritable = jest
+    .fn()
+    .mockRejectedValue(new Error('open failed'))
+
+  await main()
+
+  expect(process.exitCode).toBe(1)
+  expectNothingWritten()
+})
+
 test('keeps a locked browser database as a successful skipped update', async () => {
   mockWebScrobberExtension.prototype.isWritable = jest
     .fn()

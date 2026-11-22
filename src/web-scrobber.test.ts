@@ -172,6 +172,41 @@ test('closes the write database after a successful write', async () => {
   }
 })
 
+test('rethrows a permission error instead of reporting the database as locked', async () => {
+  const permissionError = new Error('Database failed to open', {
+    cause: { code: 'LEVEL_IO_ERROR', message: 'IO error: Permission denied' },
+  })
+  jest.spyOn(Level.prototype, 'open').mockRejectedValueOnce(permissionError)
+  const extension = new WebScrobberExtension(databasePath)
+  try {
+    await expect(extension.isWritable()).rejects.toBe(permissionError)
+  } finally {
+    extension.destroy()
+  }
+})
+
+test('rethrows a generic open failure', async () => {
+  jest.spyOn(Level.prototype, 'open').mockRejectedValueOnce(new Error('boom'))
+  const extension = new WebScrobberExtension(databasePath)
+  try {
+    await expect(extension.isWritable()).rejects.toThrow('boom')
+  } finally {
+    extension.destroy()
+  }
+})
+
+test('rethrows a failure to close the database after a successful open', async () => {
+  jest
+    .spyOn(Level.prototype, 'close')
+    .mockRejectedValueOnce(new Error('close failed'))
+  const extension = new WebScrobberExtension(databasePath)
+  try {
+    await expect(extension.isWritable()).rejects.toThrow('close failed')
+  } finally {
+    extension.destroy()
+  }
+})
+
 test('leaves the original lock intact when the database is locked', async () => {
   const database = new Level(databasePath)
   await database.open()
