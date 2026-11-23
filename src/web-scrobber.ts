@@ -1,4 +1,5 @@
 import { ApiTrack } from './fyb'
+import { isApiTrack, isTrackMetadata } from './track-validation'
 import { Level } from 'level'
 import lodash from 'lodash'
 import { tmpdir } from 'node:os'
@@ -37,7 +38,7 @@ export class WebScrobberExtension {
    * Reads the tracks stored under `LocalCache`.
    *
    * @returns The tracks, or an empty array if `LocalCache` does not exist yet
-   * @throws If `LocalCache` is not an object, so the caller never overwrites a corrupted cache
+   * @throws If `LocalCache` or a track has an invalid shape
    */
   public async getTracks(): Promise<ApiTrack[]> {
     const database = await this.getLevelDatabase(this.readLevelDbPath)
@@ -68,10 +69,16 @@ export class WebScrobberExtension {
         `Invalid LocalCache value in ${this.writeLevelDbPath}: expected an object but got ${this.describeType(tracks)}`
       )
     }
+    if (!Object.values(tracks).every(isTrackMetadata)) {
+      throw new Error(`Invalid track in LocalCache at ${this.writeLevelDbPath}`)
+    }
     return this.convertToApiTracks(tracks as WebScrobberTracks)
   }
 
   public async setTracks(tracks: ApiTrack[]): Promise<void> {
+    if (!tracks.every(isApiTrack)) {
+      throw new Error('Invalid tracks supplied for LocalCache')
+    }
     const database = await this.getLevelDatabase(this.writeLevelDbPath)
 
     try {
