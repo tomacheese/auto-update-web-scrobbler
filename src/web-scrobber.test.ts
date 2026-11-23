@@ -92,6 +92,40 @@ describe('WebScrobberExtension', () => {
     )
   })
 
+  it.each([
+    null,
+    [],
+    {},
+    { track: 1 },
+    ...['artist', 'album', 'albumArtist'].map((field) => ({
+      track: 'Title',
+      [field]: 1,
+    })),
+  ])('rejects an invalid cache entry %#', async (entry) => {
+    await seedDatabase({ LocalCache: { good: { track: 'Title' }, bad: entry } })
+    await expect(createExtension().getTracks()).rejects.toThrow(
+      'Invalid track in LocalCache'
+    )
+  })
+
+  it('rejects invalid write input without replacing existing metadata', async () => {
+    const cache = { good: { track: 'Title', artist: 'Artist' } }
+    await seedDatabase({ LocalCache: cache })
+    const extension = createExtension()
+
+    await expect(
+      extension.setTracks([{ vid: 'good', artist: 'Artist' } as ApiTrack])
+    ).rejects.toThrow('Invalid tracks supplied')
+    const database = new Level<string, unknown>(databasePath, {
+      valueEncoding: 'json',
+    })
+    try {
+      expect(await database.get('LocalCache')).toEqual(cache)
+    } finally {
+      await database.close()
+    }
+  })
+
   it('keeps browser-only tracks when server tracks are written', async () => {
     await seedDatabase({
       LocalCache: {

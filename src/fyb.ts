@@ -1,3 +1,5 @@
+import { isApiTrack } from './track-validation'
+
 export interface ApiTrack {
   vid: string
   track: string
@@ -20,7 +22,10 @@ export class FetchYoutubeBgmApi {
       throw new Error(
         `HTTP error: ${res.status} ${res.statusText} (GET ${url})`
       )
-    const data = (await res.json()) as ApiTrack[]
+    const data: unknown = await res.json()
+    if (!Array.isArray(data) || !data.every(isApiTrack)) {
+      throw new Error('Invalid server tracks response')
+    }
     return data
   }
 
